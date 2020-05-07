@@ -15,11 +15,11 @@ PoC for using Thread-Local Storage callbacks in Win8.1 and above.
 
 Thread-Local Storage (TLS) callbacks are a mechanism provided by the Windows loader to allow programs to perform initialisation tasks that are thread specific when a process starts. What is interesting about TLS callbacks is that they are executed *__before the entry point of the application__*, so before the ```main()``` function. This is problematic for a couple of reasons:
 * Debuggers usually stop at the main function, thus _missing any extra TLS code_
-* Disassemblers and static analysis tools also first present the _main_ function, again leading to possibly missing hidden code.
+* Disassemblers and static analysis tools first present the _main_ function, again leading to possibly missing hidden code.
 
 So, unless special attention is paid to discovering whether an application has any TLS code or not, malicious code can be overlooked.
 
-### Analysis
+### How to create
 
 Before creating the TLS callbacks, we need to declare the prototype for TLS callbacks:
 
@@ -28,7 +28,7 @@ Before creating the TLS callbacks, we need to declare the prototype for TLS call
 typedef void(__stdcall* TLS_CALLBACK_PTR)(void* instance, int reason, void* reserved);
 ```
 
-And, for reference, let's define also one callback function:
+And, for example, callbacks are then defined like this:
 
 ```c
 void __stdcall tls_callback1(void* instance, int reason, void* reserved) 
@@ -39,17 +39,17 @@ void __stdcall tls_callback1(void* instance, int reason, void* reserved)
 }
 ```
 
-If we were to compile the attached code and test it in Immunity, we would be in for a surprise:
+If we were to compile the attached code and test it in Immunity Debugger, we would be in for a surprise:
 
 ![Immunity](img/tls-immunity.png)
 
-The application executes the callback functions _and terminates_ without even giving us a chance to set up a program. The reason is because **Immunity is configured to stop by default at ```WinMain``` function**. In this case, one of the TLS callbacks, which executes way before ```WinMain```, also terminates the process. To fix this, we need to change the debugging options: 
+The application executes the callback functions _and terminates_ without even giving us a chance to set up a breakpoint or view the code. The reason is because **Immunity is configured to stop by default at ```WinMain``` function**. In this case one of the TLS callbacks, which executes way before ```WinMain```, also terminates the process. To fix this, we need to change the debugging options: 
 
 * Options ➝ Debugging Options ➝ Events ➝ *Make first pause at* System breakpoint
 
 ![Immunity debugging options](img/immunity-options.png)
 
-In this case at least Immunity alerts us that something might be wrong. If we were to try to open the same compiled file in IDA Pro, the analysis would begin at the ```start_0```:
+Immunity at least alerted us that something might be wrong. If we try to open the same compiled file in IDA Pro, the analysis begins at the ```start_0```:
 
 ![IDA Start](img/ida-start.png)
 
@@ -57,7 +57,7 @@ This is not exactly the ```main``` function, but is way *after* the TLS callback
 
 ### How to detect TLS
 
-If we search the callbacks manually, we should find them in the ```TlsCallbacks``` variable, which is already extracted by IDA from the PE header:
+In IDA Pro we should find the TLS callbacks in the ```TlsCallbacks``` variable, which is already extracted from the PE header:
 
 ![IDA TLS callbacks](img/ida-tls-callbacks.png)
 
