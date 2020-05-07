@@ -1,6 +1,6 @@
 # TLS-PoC
 
-PoC for using TLS in Win8.1 and above
+PoC for using Thread-Local Storage callbacks in Win8.1 and above.
 
 ```
 ████████╗██╗     ███████╗    ██████╗  ██████╗  ██████╗
@@ -10,12 +10,14 @@ PoC for using TLS in Win8.1 and above
    ██║   ███████╗███████║    ██║     ╚██████╔╝╚██████╗
    ╚═╝   ╚══════╝╚══════╝    ╚═╝      ╚═════╝  ╚═════╝
 ```
-   
-how to execute code before the entry point of the application and before the main function and confuse some debuggers along the way. Let's begin.
 
 ### Description
 
-blah
+Thread-Local Storage (TLS) callbacks are a mechanism provided by the Windows loader to allow programs to perform initialisation tasks that are thread specific when a process starts. What is interesting about TLS callbacks is that they are executed *__before the entry point of the application__*, so before the ```main()``` function. This is problematic for a couple of reasons:
+* Debuggers usually stop at the main function, thus _missing any extra TLS code_
+* Static analysis tools 
+
+So, unless special attention is paid to discovering whether an application has any TLS code or not, possibly malicious code can be overlooked.
 
 ### Analysis
 
@@ -29,7 +31,14 @@ default is WinMain
 ida pro 
 
 
-Analysis tools:
+![Immunity](img/tls-immunity.png)
+
+![Immunity debugging options](img/immunity-options.png)
+
+![IDA TLS callbacks](img/ida-tls-callbacks.png)
+
+![CFF Explorer TLS Directory](img/cff-tls-dir.png)
+
 ### How to detect TLS
 
 * CFF Explorer
