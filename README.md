@@ -20,6 +20,12 @@ blah
 ### Analysis
 
 immunity
+
+Make first pause at:
+
+Options  Debugging Options Events System breakpoint
+
+default is WinMain
 ida pro 
 
 
