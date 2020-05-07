@@ -13,13 +13,21 @@ PoC for using TLS in Win8.1 and above
    
 how to execute code before the entry point of the application and before the main function and confuse some debuggers along the way. Let's begin.
 
-Analysis tools:
+### Description
 
-- Immunity debugger
-- CFF Explorer 
-- LordPE
-- IDA Pro
-- Visual studio IDE
+blah
+
+### Analysis
+
+immunity
+ida pro 
+
+
+Analysis tools:
+### How to detect TLS
+
+* CFF Explorer
+* command line option ?
 
 ### References
 
